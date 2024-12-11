@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: YHmaRZXhnmuZwMlswfGyYYTlUiHggXWF
+      MYSQL_DATABASE: railway
+      MYSQL_USER: postgres
+      MYSQL_PASSWORD: YHmaRZXhnmuZwMlswfGyYYTlUiHggXWF
+    volumes:
+      - mysqlDataContable:/var/lib/mysql
+    ports:
+      - 3306:3306
+
+volumes:
+  mysqlDataContable:

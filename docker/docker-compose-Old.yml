@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: YHmaRZXhnmuZwMlswfGyYYTlUiHggXWF
+      POSTGRES_DB: railway
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+
+volumes:
+  pgdata:

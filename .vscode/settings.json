@@ -1,0 +1,15 @@
+{
+    "material-icon-theme.activeIconPack": "nest",
+    "git.ignoreLimitWarning": true,
+    "cSpell.words": [
+        "administracion",
+        "descripsion",
+        "justificacion",
+        "Justificacion",
+        "razon",
+        "revisadocajero",
+        "Segun",
+        "SUPERADMIN"
+    ],
+    "prettier.bracketSameLine": true
+}

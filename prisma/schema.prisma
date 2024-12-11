@@ -1,0 +1,201 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum PrimaryRole {
+  user
+  admin
+  superAdmin
+  root
+}
+
+model Auth_company {
+  id         Int          @id @default(autoincrement())
+  auth_users Auth_users[] @relation("CompanyUsers") // Relación uno a muchos
+  roles      Role[]       @relation("CompanyRoles") // Relación uno a muchos
+
+  groups_company_plan Groups_company_plan? @relation("CompanyGroups") // Relación uno a uno
+
+  Libro_Diario Libro_Diario[] @relation("CompanyLibroDiario")
+
+  admin_logs Admin_logs[] @relation("CompanyLogs") // Relación uno a muchos
+
+  Cuenta_contables Cuenta_contables[] @relation("CompanyCuenta_contables")
+
+  authKeyCompany String  @unique
+  description    String? @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  is_active Boolean  @default(true)
+
+  @@map("auth_company")
+}
+
+model Auth_users {
+  id          Int     @id @default(autoincrement())
+  username    String
+  password    String
+  description String? @default("")
+  email       String?
+
+  first_name  String?
+  second_name String?
+
+  companyId Int? // Llave foránea que referencia a Auth_company
+  company   Auth_company? @relation("CompanyUsers", fields: [companyId], references: [id]) // Relación inversa
+
+  Admin_logs Admin_logs[]
+
+  role Role? @relation("Auth_usersRole")
+
+  primaryRole PrimaryRole @default(user)
+
+  last_login DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  is_active  Boolean   @default(true)
+
+  @@unique([companyId, username])
+  @@map("auth_users")
+}
+
+model Role {
+  id             Int     @id @default(autoincrement())
+  name           String
+  id_permissions Int
+  description    String? @default("")
+
+  permissions   Permissions? @relation("RolePermissions", fields: [permissionsId], references: [id]) // Relación uno a uno
+  permissionsId Int?         @unique // Llave foránea opcional para la relación con Permissions
+
+  auth_users   Auth_users @relation("Auth_usersRole", fields: [auth_usersId], references: [id])
+  auth_usersId Int        @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  is_active Boolean
+
+  companyId Int // Llave foránea que referencia a Auth_company
+  company   Auth_company @relation("CompanyRoles", fields: [companyId], references: [id]) // Relación inversa
+
+  @@unique([companyId, name])
+}
+
+model Permissions {
+  id                   Int     @id @default(autoincrement())
+  libro_mayor          Boolean @default(false)
+  libro_diario_        Boolean @default(false)
+  bancos               Boolean @default(false)
+  caja                 Boolean @default(false)
+  balance_comprobacion Boolean @default(false)
+  est_financieros      Boolean @default(false)
+  asientos_contables   Boolean @default(false)
+  export_data          Boolean @default(false)
+  import_data          Boolean @default(false)
+
+  role Role? @relation("RolePermissions")
+
+  Groups_company_plan Groups_company_plan? @relation("PermissionsGroups_company_plan")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+}
+
+model Groups_company_plan {
+  id          Int     @id @default(autoincrement())
+  nombre      String
+  description String? @default("")
+
+  permissions   Permissions @relation("PermissionsGroups_company_plan", fields: [permissionsId], references: [id])
+  permissionsId Int         @unique
+
+  companyId Int?          @unique // Este campo puede ser opcional si un plan no siempre está asociado a una empresa
+  company   Auth_company? @relation("CompanyGroups", fields: [companyId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, nombre])
+}
+
+model Cuenta_contables_tipo {
+  id          Int     @id @default(autoincrement())
+  nombre      String
+  description String? @default("")
+  codigo      Int     @unique // Código único para la cuenta
+
+  Cuenta_contables Cuenta_contables[] @relation("Cuenta_contables_TIPO")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//// cuentas
+model Cuenta_contables {
+  id          Int     @id @default(autoincrement())
+  codigo      Int // Código único para la cuenta
+  nombre      String // Nombre descriptivo de la cuenta
+  description String? @default("")
+
+  Cuenta_contable_tipoId Int
+  Cuenta_contable_tipo   Cuenta_contables_tipo @relation("Cuenta_contables_TIPO", fields: [Cuenta_contable_tipoId], references: [codigo])
+
+  companyId Int? // Llave foránea que referencia a Auth_company
+  company   Auth_company? @relation("CompanyCuenta_contables", fields: [companyId], references: [id]) // Relación inversa
+
+  // Relación con Diario
+  transacciones Libro_Diario[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, codigo])
+}
+
+model Libro_Diario {
+  id          Int      @id @default(autoincrement())
+  fecha       DateTime
+  cuentaId    Int // Referencia a la cuenta
+  debe        Float
+  haber       Float
+  descripcion String?
+
+  // Relación con Auth_company
+  companyId Int? // Llave foránea que referencia a Auth_company
+  company   Auth_company? @relation("CompanyLibroDiario", fields: [companyId], references: [id]) // Relación inversa
+
+  // Relación con Cuenta
+  cuenta Cuenta_contables @relation(fields: [cuentaId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+///
+model Admin_logs {
+  id            Int      @id @default(autoincrement())
+  action_time   DateTime
+  object_action Json
+  message       String
+
+  user      Auth_users? @relation(fields: [userId], references: [id])
+  userId    Int?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  companyId Int // Llave foránea que referencia a Auth_company
+  company   Auth_company @relation("CompanyLogs", fields: [companyId], references: [id]) // Relación inversa
+}

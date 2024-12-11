@@ -1,0 +1,348 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  user
+  admin
+  superAdmin
+}
+
+model DataPrincipal {
+  id            Int    @id @default(autoincrement())
+  nombreEmpresa String @unique
+}
+
+model CategoriasJuegos {
+  id          Int       @id @default(autoincrement())
+  name        String
+  programa    Programas @relation(fields: [programasId], references: [id])
+  programasId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TasaDolar {
+  id Int @id @default(autoincrement())
+
+  fecha DateTime @unique @default(now())
+  tasa  Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  CierreDiario_Tabla_Final_Grupo CierreDiario_Tabla_Final_Grupo[]
+}
+
+//los User vas a ser las Cajas que se asignan a la agencia
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  role     Role?  @default(user)
+  password String @db.VarChar(100)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agencias       Agencias[]
+  dataUser       DataUsers?       @relation
+  notificaciones Notificaciones[]
+
+  @@map("users")
+}
+
+//identificacion de empleado para cuando este entre a la caja
+model Responsable {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  tlf         String?
+  img         String?
+  description String?
+
+  password  String   @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DataUsers {
+  id      Int     @id
+  nro_tlf String
+  foto    String?
+
+  user User @relation(fields: [id], references: [id])
+
+  @@map("data_users")
+}
+
+model Banca {
+  id          Int     @id @default(autoincrement())
+  nombre      String  @unique
+  description String? @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  programas Programas[]
+}
+
+model Programas {
+  id Int @id @default(autoincrement())
+
+  banca   Banca? @relation(fields: [bancaId], references: [id])
+  bancaId Int?
+
+  nombre        String  @unique
+  imagen        String?
+  ganancia_neta Float
+  utilidad      Float
+  juegoDolares  Boolean
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agencia                      Agencias[]
+  cierreDiarioProgramasBs      CierreDiarioProgramasBs[]
+  cierreDiarioProgramasDolares CierreDiarioProgramasDolares[]
+  CategoriasJuegos             CategoriasJuegos[]
+  Premios                      Premios[]
+}
+
+model Agencias {
+  id                 Int    @id @default(autoincrement())
+  nombre             String
+  ubicacion          String @db.VarChar(100)
+  correo_electronico String @db.VarChar(100)
+
+  programas Programas[]
+  empleados User[]
+
+  CierreDiario                   CierreDiario_Justificacion_Grupo[]
+  notificaciones                 Notificaciones[]
+  CierreDiario_Tabla_Final_Grupo CierreDiario_Tabla_Final_Grupo[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  premios Premios[]
+
+  @@map("agencias")
+}
+
+model Dolares {
+  id Int @id @default(autoincrement())
+
+  creador     String
+  monto       Float   @default(0)
+  update_user String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  CierreDiario   CierreDiario_Justificacion_Grupo? @relation(fields: [cierreDiarioId], references: [id])
+  cierreDiarioId Int?
+}
+
+// tablas de los cuadres de caja
+model Gastos {
+  id Int @id @default(autoincrement())
+
+  creador String
+  razon   String? @default("") @db.VarChar(200)
+  monto   Float?  @default(0)
+  imagen  String? @default("")
+
+  update_user    String?
+  createdAt      DateTime                          @default(now())
+  updatedAt      DateTime                          @updatedAt
+  CierreDiario   CierreDiario_Justificacion_Grupo? @relation(fields: [cierreDiarioId], references: [id])
+  cierreDiarioId Int?
+
+  @@map("gastos")
+}
+
+model Efectivo {
+  id Int @id @default(autoincrement())
+
+  monto Float @default(0)
+
+  update_user    String?
+  creador        String
+  createdAt      DateTime                          @default(now())
+  updatedAt      DateTime                          @updatedAt
+  CierreDiario   CierreDiario_Justificacion_Grupo? @relation(fields: [cierreDiarioId], references: [id])
+  cierreDiarioId Int?
+
+  @@map("efecivo")
+}
+
+model PagoMovil {
+  id Int @id @default(autoincrement())
+
+  referencia    String? @default("")
+  descripsion   String? @default("")
+  monto         Float?  @default(0)
+  bancoReceptor String? @default("")
+  bancoEmisor   String? @default("")
+
+  update_user    String?                           @default("")
+  creador        String?                           @default("")
+  createdAt      DateTime                          @default(now())
+  updatedAt      DateTime                          @updatedAt
+  CierreDiario   CierreDiario_Justificacion_Grupo? @relation(fields: [cierreDiarioId], references: [id])
+  cierreDiarioId Int?
+
+  @@map("pago_movil")
+}
+
+model PuntoVenta {
+  id Int @id @default(autoincrement())
+
+  monto       Float   @default(0)
+  descripsion String?
+
+  update_user    String?
+  creador        String
+  createdAt      DateTime                          @default(now())
+  updatedAt      DateTime                          @updatedAt
+  CierreDiario   CierreDiario_Justificacion_Grupo? @relation(fields: [cierreDiarioId], references: [id])
+  cierreDiarioId Int?
+
+  @@map("punto_venta")
+}
+
+//agrupacion de los modelos Agencias,Gastos,Efectivo,PagoMovil,PuntoVenta
+model CierreDiario_Justificacion_Grupo {
+  id        Int      @id @default(autoincrement())
+  agenciaId Int // Foreign key for the Agencia
+  agencia   Agencias @relation(fields: [agenciaId], references: [id])
+
+  update_user String?
+  creador     String
+  gastos      Gastos[]
+  efectivo    Efectivo[]
+  pagoMovil   PagoMovil[]
+  puntoVenta  PuntoVenta[]
+  dolares     Dolares[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  CierreDiario_Tabla_Final_Grupo CierreDiario_Tabla_Final_Grupo[]
+
+  @@map("cierre_diario_justificacion_grupo")
+}
+
+model CierreDiarioProgramasBs {
+  id Int @id @default(autoincrement())
+
+  venta          Float @default(0)
+  premios        Float @default(0)
+  administracion Float @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  programa   Programas @relation(fields: [programaId], references: [id])
+  programaId Int
+
+  CierreDiario_Tabla_Final_Grupo CierreDiario_Tabla_Final_Grupo[]
+
+  @@map("cierre_diario_programas_bs")
+}
+
+model CierreDiarioProgramasDolares {
+  id Int @id @default(autoincrement())
+
+  venta          Float @default(0)
+  premios        Float @default(0)
+  administracion Float @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  programa   Programas @relation(fields: [programaId], references: [id])
+  programaId Int
+
+  CierreDiario_Tabla_Final_Grupo CierreDiario_Tabla_Final_Grupo[]
+
+  @@map("cierre_diario_programas_dolares")
+}
+
+model CierreDiario_Tabla_Final_Grupo {
+  id          Int     @id @default(autoincrement())
+  creador     String // CAJA QUE CREO ESTE CIERRE
+  update_user String?
+  fase        Boolean // FASE FALSE ES TODOS LOS CONSEGALDOR Y TRUE SERA EL FINAL DE LA CUAL SE SACARA LA SUMA TOTAL
+
+  revisadoAdministrador Boolean? @default(false)
+  revisadocajero        Boolean? @default(false)
+
+  agencia   Agencias @relation(fields: [agenciaId], references: [id])
+  agenciaId Int
+
+  cierreDiario_Justificacion_Grupo CierreDiario_Justificacion_Grupo @relation(fields: [JustificacionId], references: [id])
+  JustificacionId                  Int
+
+  cierreDiario_Programas_bs CierreDiarioProgramasBs[]
+
+  cierreDiario_Programas_dolar CierreDiarioProgramasDolares[]
+
+  tasaDolar   TasaDolar @relation(fields: [tasaDolarId], references: [id])
+  tasaDolarId Int
+
+  fechaMovimiento DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+///// -----------------premios por pagar-----------------------
+
+model Premios {
+  id          Int       @id @default(autoincrement())
+  creador     String
+  exp_init    DateTime  @default(now())
+  exp_end     DateTime? // Sin valor por defecto aquí
+  exp         Boolean?  @default(false)
+  exp_time    Boolean?  @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  monto       Float     @default(0.00)
+  codTicket   String
+  modoDolar   Boolean?  @default(false)
+  description String?
+
+  Agencias    Agencias  @relation(fields: [agenciasId], references: [id])
+  agenciasId  Int
+  programa    Programas @relation(fields: [programasId], references: [id])
+  programasId Int
+}
+
+//notificaciones
+
+model Notificaciones {
+  id          Int     @id @default(autoincrement())
+  descripcion String
+  statusLeida Boolean
+
+  agencia             Agencias? @relation(fields: [id], references: [id])
+  emisor              String
+  RoleReceptor        Role?     @default(superAdmin)
+  receptor_especifico User?     @relation(fields: [userId], references: [id])
+  userId              Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

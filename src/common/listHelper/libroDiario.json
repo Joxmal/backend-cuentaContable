@@ -1,0 +1,54 @@
+{
+  "cuentas contables": {
+  },
+  "libro_diario": {
+    "estructura": {
+      "fecha": "Date",
+      "numero_asiento": "Number",
+      "descripcion": "String",
+      "movimientos": [
+        {
+          "cuenta": "String",
+          "tipo": "Enum:['DEBE', 'HABER']",
+          "monto": "Number"
+        }
+      ]
+    },
+    "ejemplo": [
+      {
+        "fecha": "2023-06-01",
+        "numero_asiento": 1,
+        "descripcion": "Compra de mercancía al contado",
+        "movimientos": [
+          {
+            "cuenta": "1131",
+            "tipo": "DEBE",
+            "monto": 10000
+          },
+          {
+            "cuenta": "1111",
+            "tipo": "HABER",
+            "monto": 10000
+          }
+        ]
+      },
+      {
+        "fecha": "2023-06-02",
+        "numero_asiento": 2,
+        "descripcion": "Venta de mercancía al crédito",
+        "movimientos": [
+          {
+            "cuenta": "1121",
+            "tipo": "DEBE",
+            "monto": 15000
+          },
+          {
+            "cuenta": "4110",
+            "tipo": "HABER",
+            "monto": 15000
+          }
+        ]
+      }
+    ]
+  }
+}
