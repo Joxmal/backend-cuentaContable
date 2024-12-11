@@ -43,7 +43,11 @@ export class CuentasContablesService {
 
   async findAll() {
     try {
-      return await this.prisma.cuenta_contables.findMany();
+      return await this.prisma.cuenta_contables.findMany({
+        orderBy: {
+          codigo: 'asc',
+        },
+      });
     } catch (error) {
       console.error(error);
     }
@@ -64,6 +68,15 @@ export class CuentasContablesService {
   }
 
   remove(id: number) {
-    return `This action removes a #${id} cuentasContable`;
+    try {
+      return this.prisma.cuenta_contables.delete({
+        where: {
+          id: id,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      throw new Error('Error al eliminar la cuenta contable');
+    }
   }
 }

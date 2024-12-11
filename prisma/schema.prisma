@@ -73,10 +73,9 @@ model Auth_users {
 }
 
 model Role {
-  id             Int     @id @default(autoincrement())
-  name           String
-  id_permissions Int
-  description    String? @default("")
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String? @default("")
 
   permissions   Permissions? @relation("RolePermissions", fields: [permissionsId], references: [id]) // Relación uno a uno
   permissionsId Int?         @unique // Llave foránea opcional para la relación con Permissions
