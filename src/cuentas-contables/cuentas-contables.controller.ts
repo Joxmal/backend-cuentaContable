@@ -26,22 +26,25 @@ export class CuentasContablesController {
   findAll() {
     return this.cuentasContablesService.findAll();
   }
-  @Get('primary')
-  findAllPrimary() {
-    return this.cuentasContablesService.findAllPrimary();
+  @Get('tipos')
+  findAllTipos() {
+    return this.cuentasContablesService.findAll_Tipos();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cuentasContablesService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.cuentasContablesService.findOne(id);
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateCuentasContableDto: UpdateCuentasContableDto,
   ) {
-    return this.cuentasContablesService.update(+id, updateCuentasContableDto);
+    return await this.cuentasContablesService.update(
+      +id,
+      updateCuentasContableDto,
+    );
   }
 
   @Delete(':id')

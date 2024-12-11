@@ -9,9 +9,12 @@ export class CuentasContablesService {
   constructor(private prisma: PrismaService) {}
 
   async create(createCuentasContableDto: CreateCuentasContableDto) {
+    const primerNumero = Number(
+      String(createCuentasContableDto.cuentaPadreCod)[0],
+    );
     const cuentaTipo = await this.prisma.cuenta_contables_tipo.findUnique({
       where: {
-        codigo: createCuentasContableDto.cuentaPadreCod,
+        codigo: primerNumero,
       },
     });
 
@@ -37,7 +40,23 @@ export class CuentasContablesService {
     }
   }
 
-  findAllPrimary() {
+  async findAll_Tipos() {
+    let tipos = await this.prisma.cuenta_contables_tipo.findMany();
+    if (tipos.length === 0) {
+      const dataToInsert = cuentasPrimary.map((cuenta) => ({
+        codigo: cuenta.value,
+        nombre: cuenta.tipo,
+        description: cuenta.description,
+      }));
+
+      await this.prisma.cuenta_contables_tipo.createMany({
+        data: dataToInsert,
+      });
+      tipos = await this.prisma.cuenta_contables_tipo.findMany();
+    }
+
+    return tipos; // Retorna los tipos encontrados o insertados
+
     return cuentasPrimary;
   }
 
@@ -57,19 +76,27 @@ export class CuentasContablesService {
     return `This action returns a #${id} cuentasContable`;
   }
 
-  update(id: number, updateCuentasContableDto: UpdateCuentasContableDto) {
-    const data = updateCuentasContableDto;
-
-    return {
-      id: Math.floor(Math.random() * 1000) + 1,
-      ...data,
-    };
-    return `This action updates a #${id} cuentasContable`;
+  async update(id: number, updateCuentasContableDto: UpdateCuentasContableDto) {
+    try {
+      return await this.prisma.cuenta_contables.update({
+        where: {
+          id,
+        },
+        data: {
+          codigo: updateCuentasContableDto.cod,
+          nombre: updateCuentasContableDto.name,
+          description: updateCuentasContableDto.description,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      throw new Error('Error al Editar la cuenta contable');
+    }
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     try {
-      return this.prisma.cuenta_contables.delete({
+      return await this.prisma.cuenta_contables.delete({
         where: {
           id: id,
         },
