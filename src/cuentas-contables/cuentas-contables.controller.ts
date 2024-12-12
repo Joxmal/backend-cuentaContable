@@ -10,7 +10,15 @@ import {
 import { CuentasContablesService } from './cuentas-contables.service';
 import { CreateCuentasContableDto } from './dto/create-cuentas-contable.dto';
 import { UpdateCuentasContableDto } from './dto/update-cuentas-contable.dto';
+import { ExtractToken } from 'src/common/decorators/userToken.decorator';
+import { UserAuth } from 'src/auth/auth.service';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { Role } from 'src/common/enums/rol.enum';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Modulo CUENTAS-CONTABLES')
+@ApiBearerAuth()
+@Auth(Role.USER)
 @Controller('cuentas-contables')
 export class CuentasContablesController {
   constructor(
@@ -18,13 +26,16 @@ export class CuentasContablesController {
   ) {}
 
   @Post()
-  create(@Body() createCuentasContableDto: CreateCuentasContableDto) {
-    return this.cuentasContablesService.create(createCuentasContableDto);
+  create(
+    @Body() createCuentasContableDto: CreateCuentasContableDto,
+    @ExtractToken() user: UserAuth,
+  ) {
+    return this.cuentasContablesService.create(createCuentasContableDto, user);
   }
 
   @Get()
-  findAll() {
-    return this.cuentasContablesService.findAll();
+  findAll(@ExtractToken() user: UserAuth) {
+    return this.cuentasContablesService.findAll(user);
   }
   @Get('tipos')
   findAllTipos() {
@@ -32,8 +43,8 @@ export class CuentasContablesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.cuentasContablesService.findOne(id);
+  findOne(@Param('id') id: number, @ExtractToken() user: UserAuth) {
+    return this.cuentasContablesService.findOne(id, user);
   }
 
   @Patch(':id')

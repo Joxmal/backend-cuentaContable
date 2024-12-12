@@ -14,6 +14,7 @@ import { PremiosModule } from './premios/premios.module';
 import { BancaModule } from './banca/banca.module'; */
 import { UserModule } from './user/user.module';
 import { CuentasContablesModule } from './cuentas-contables/cuentas-contables.module';
+import { LibroDiarioModule } from './libro-diario/libro-diario.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CuentasContablesModule } from './cuentas-contables/cuentas-contables.mo
     AuthModule,
     UserModule,
     CuentasContablesModule,
+    LibroDiarioModule,
   ],
   controllers: [],
   providers: [],

@@ -19,6 +19,7 @@ import { $Enums } from '@prisma/client';
 export interface Payload {
   userId: number;
   company: string;
+  companyId: number;
   user: string;
   rolePrimary: $Enums.PrimaryRole;
   roleCompanyId: {
@@ -28,11 +29,17 @@ export interface Payload {
 }
 
 export interface UserAuth {
-  id: number;
+  userId: number;
   company: string;
+  companyId: number;
   user: string;
   rolePrimary: Role;
-  roleCompany: string;
+  roleCompanyId: {
+    name: string;
+    permissionsId: number;
+  };
+  iat: string;
+  exp: string;
 }
 
 @Injectable()
@@ -107,6 +114,7 @@ export class AuthService {
 
     const payload: Payload = {
       userId: userExist.auth_users[0].id,
+      companyId: userExist.id,
       company: userExist.authKeyCompany,
       user: userExist.auth_users[0].username,
       rolePrimary: userExist.auth_users[0].primaryRole,

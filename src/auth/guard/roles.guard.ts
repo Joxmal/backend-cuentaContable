@@ -7,15 +7,19 @@ import {
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { $Enums } from '@prisma/client';
+import { PrismaService } from 'src/prisma.service';
 
 /* import { UserAuth } from '../auth.service'; */
 import { JwtStrategyInterface } from '../interface/jwt-strategy.interface';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly reflector: Reflector,
+  ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredRole = this.reflector.getAllAndOverride<$Enums.PrimaryRole>(
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
@@ -34,6 +38,22 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('No se ha iniciado sesión');
     }
 
+    const companyAuth = await this.prisma.auth_company.findUnique({
+      where: {
+        id: request.companyId,
+        auth_users: {
+          some: {
+            id: request.userId,
+            username: request.name,
+          },
+        },
+      },
+    });
+
+    if (!companyAuth) {
+      throw new ForbiddenException('usted no pertenece a la compañia');
+    }
+
     return this.hasAccess(request.role, requiredRole);
   }
 
@@ -41,8 +61,8 @@ export class RolesGuard implements CanActivate {
     userRequestRole: $Enums.PrimaryRole,
     requiredRole: $Enums.PrimaryRole,
   ): boolean {
-    console.log('userRequestRole', userRequestRole);
-    console.log('requiredRole', requiredRole);
+    // console.log('userRequestRole', userRequestRole);
+    // console.log('requiredRole', requiredRole);
 
     switch (userRequestRole) {
       case $Enums.PrimaryRole.root:

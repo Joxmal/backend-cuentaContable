@@ -3,12 +3,16 @@ import { CreateCuentasContableDto } from './dto/create-cuentas-contable.dto';
 import { UpdateCuentasContableDto } from './dto/update-cuentas-contable.dto';
 import { cuentasPrimary } from './lista/primary';
 import { PrismaService } from 'src/prisma.service';
+import { UserAuth } from 'src/auth/auth.service';
 
 @Injectable()
 export class CuentasContablesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createCuentasContableDto: CreateCuentasContableDto) {
+  async create(
+    createCuentasContableDto: CreateCuentasContableDto,
+    user: UserAuth,
+  ) {
     const primerNumero = Number(
       String(createCuentasContableDto.cuentaPadreCod)[0],
     );
@@ -27,6 +31,7 @@ export class CuentasContablesService {
     try {
       const createCuentasContable = await this.prisma.cuenta_contables.create({
         data: {
+          companyId: user.companyId,
           codigo: createCuentasContableDto.cod,
           nombre: createCuentasContableDto.name,
           description: createCuentasContableDto.description,
@@ -59,8 +64,8 @@ export class CuentasContablesService {
 
     return cuentasPrimary;
   }
-
-  async findAll() {
+  async findAll(user: UserAuth) {
+    console.log(user);
     try {
       return await this.prisma.cuenta_contables.findMany({
         orderBy: {
@@ -72,8 +77,8 @@ export class CuentasContablesService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} cuentasContable`;
+  findOne(id: number, user: UserAuth) {
+    return `This action returns a #${id + user.company} cuentasContable`;
   }
 
   async update(id: number, updateCuentasContableDto: UpdateCuentasContableDto) {
