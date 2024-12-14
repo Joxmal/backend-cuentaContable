@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateCuentasContableDto } from './dto/create-cuentas-contable.dto';
 import { UpdateCuentasContableDto } from './dto/update-cuentas-contable.dto';
 import { cuentasPrimary } from './lista/primary';
 import { PrismaService } from 'src/prisma.service';
 import { UserAuth } from 'src/auth/auth.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CuentasContablesService {
@@ -38,10 +43,10 @@ export class CuentasContablesService {
           Cuenta_contable_tipoId: cuentaTipo.codigo,
         },
       });
+
       return createCuentasContable;
     } catch (error) {
-      console.error(error);
-      throw new Error('Error al crear la cuenta contable');
+      this.handlePrismaError(error);
     }
   }
 
@@ -65,7 +70,7 @@ export class CuentasContablesService {
     return cuentasPrimary;
   }
   async findAll(user: UserAuth) {
-    console.log(user);
+    // console.log(user);
     try {
       return await this.prisma.cuenta_contables.findMany({
         orderBy: {
@@ -110,5 +115,18 @@ export class CuentasContablesService {
       console.error(error);
       throw new Error('Error al eliminar la cuenta contable');
     }
+  }
+
+  private handlePrismaError(e: any) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      if (e.code === 'P2002') {
+        throw new ConflictException('Cuenta ya creada');
+      } else if (e.code === 'P2025') {
+        throw new ConflictException('Cuenta no encontrada');
+      }
+    } else {
+      console.error(e);
+    }
+    throw new InternalServerErrorException(e.message);
   }
 }

@@ -156,7 +156,7 @@ model Cuenta_contables {
   company   Auth_company? @relation("CompanyCuenta_contables", fields: [companyId], references: [id]) // Relación inversa
 
   // Relación con Diario
-  transacciones Libro_Diario[] @relation("Cuenta_contablesToLibro_Diario")
+  // transacciones Libro_Diario[] @relation("Cuenta_contablesToLibro_Diario")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -165,12 +165,12 @@ model Cuenta_contables {
 }
 
 model Libro_Diario {
-  id          Int              @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   asiento     Int
   fecha       DateTime
   // Relación con Cuenta
   cuentaId    Int // Referencia a la cuenta
-  cuenta      Cuenta_contables @relation("Cuenta_contablesToLibro_Diario", fields: [cuentaId], references: [id])
+  // cuenta      Cuenta_contables @relation("Cuenta_contablesToLibro_Diario", fields: [cuentaId], references: [codigo])
   descripcion String?
   debe        Float
   haber       Float

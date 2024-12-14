@@ -24,11 +24,11 @@ export class LibroDiarioController {
   constructor(private readonly libroDiarioService: LibroDiarioService) {}
 
   @Post()
-  create(
+  async create(
     @Body() createLibroDiarioDto: CreateLibroDiarioDto,
     @ExtractToken() user: UserAuth,
   ) {
-    return this.libroDiarioService.create(createLibroDiarioDto, user);
+    return await this.libroDiarioService.create(createLibroDiarioDto, user);
   }
 
   @Get()

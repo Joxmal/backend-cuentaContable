@@ -17,7 +17,7 @@ import { LoggerMiddleware } from './logger/logger.middleware';
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '4h' },
+      signOptions: { expiresIn: '8h' },
     }),
   ],
   exports: [AuthService],

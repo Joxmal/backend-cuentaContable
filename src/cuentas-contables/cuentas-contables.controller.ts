@@ -18,7 +18,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Modulo CUENTAS-CONTABLES')
 @ApiBearerAuth()
-@Auth(Role.USER)
+@Auth(Role.ROOT)
 @Controller('cuentas-contables')
 export class CuentasContablesController {
   constructor(

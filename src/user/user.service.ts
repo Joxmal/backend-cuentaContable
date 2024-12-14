@@ -12,8 +12,6 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    console.log(createUserDto);
-
     try {
       const userExisting = await this.prisma.auth_users.findUnique({
         where: {
@@ -24,7 +22,6 @@ export class UserService {
         },
       });
 
-      console.log(userExisting);
       if (userExisting) {
         throw new ConflictException('Ya existe este usuario');
       }
