@@ -69,8 +69,9 @@ export class CuentasContablesService {
 
     return cuentasPrimary;
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async findAll(user: UserAuth) {
-    // console.log(user);
+    //TODO: darle uso al user
     try {
       return await this.prisma.cuenta_contables.findMany({
         orderBy: {

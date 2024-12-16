@@ -8,16 +8,17 @@ import {
 import { Type } from 'class-transformer';
 
 export class CreateLibroDiarioDto {
+  @IsOptional()
   @IsNumber()
-  asiento: number;
-
-  @IsDate()
-  @Type(() => Date)
-  fechaMovimientoDesde: Date;
+  asiento?: number;
 
   @ValidateNested()
   @Type(() => createdRowLibroDiario)
   createdRowLibroDiario: createdRowLibroDiario[];
+
+  @IsDate()
+  @Type(() => Date)
+  fechaMovimientoDesde: Date;
 }
 
 class createdRowLibroDiario {

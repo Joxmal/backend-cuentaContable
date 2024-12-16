@@ -44,7 +44,7 @@ async function bootstrap() {
   });
 
   // Start the server and listen on port
-  await app.listen(process.env.PORT);
+  await app.listen(process.env.PORT, '127.0.0.1');
   console.log(`app in ${await app.getUrl()}`);
 }
 bootstrap();

@@ -32,12 +32,12 @@ export class LibroDiarioController {
   }
 
   @Get()
-  findAll(@ExtractToken() user: UserAuth) {
-    return this.libroDiarioService.findAll(user);
+  async findAll(@ExtractToken() user: UserAuth) {
+    return await this.libroDiarioService.findAll(user);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @ExtractToken() user: UserAuth) {
+  async findOne(@Param('id') id: string, @ExtractToken() user: UserAuth) {
     return this.libroDiarioService.findOne(+id, user);
   }
 
