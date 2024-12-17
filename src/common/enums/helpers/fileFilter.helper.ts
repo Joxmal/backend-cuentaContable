@@ -1,6 +1,7 @@
 export const fileFilter = (
   req: Express.Request,
   file: Express.Multer.File,
+  // eslint-disable-next-line @typescript-eslint/ban-types
   cb: Function,
 ) => {
   // console.log(file);

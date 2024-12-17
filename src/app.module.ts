@@ -15,6 +15,7 @@ import { BancaModule } from './banca/banca.module'; */
 import { UserModule } from './user/user.module';
 import { CuentasContablesModule } from './cuentas-contables/cuentas-contables.module';
 import { LibroDiarioModule } from './libro-diario/libro-diario.module';
+import { LibroMayorModule } from './libro-mayor/libro-mayor.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { LibroDiarioModule } from './libro-diario/libro-diario.module';
     UserModule,
     CuentasContablesModule,
     LibroDiarioModule,
+    LibroMayorModule,
   ],
   controllers: [],
   providers: [],

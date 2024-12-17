@@ -6,5 +6,6 @@ import { PrismaService } from 'src/prisma.service';
 @Module({
   controllers: [LibroDiarioController],
   providers: [LibroDiarioService, PrismaService],
+  exports: [LibroDiarioService],
 })
 export class LibroDiarioModule {}

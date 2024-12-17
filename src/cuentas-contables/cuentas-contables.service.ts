@@ -74,6 +74,9 @@ export class CuentasContablesService {
     //TODO: darle uso al user
     try {
       return await this.prisma.cuenta_contables.findMany({
+        where: {
+          companyId: user.companyId,
+        },
         orderBy: {
           codigo: 'asc',
         },

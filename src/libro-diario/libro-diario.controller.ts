@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { LibroDiarioService } from './libro-diario.service';
 import { CreateLibroDiarioDto } from './dto/create-libro-diario.dto';
@@ -15,6 +16,7 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Role } from 'src/common/enums/rol.enum';
 import { ExtractToken } from 'src/common/decorators/userToken.decorator';
 import { UserAuth } from 'src/auth/auth.service';
+import { FindLibroDiarioDto } from './dto/find-libro-diario.dto';
 
 @Auth(Role.USER)
 @ApiTags('Modulo LIBRO-DIARIO')
@@ -32,8 +34,11 @@ export class LibroDiarioController {
   }
 
   @Get()
-  async findAll(@ExtractToken() user: UserAuth) {
-    return await this.libroDiarioService.findAll(user);
+  async findAll(
+    @ExtractToken() user: UserAuth,
+    @Query() query: FindLibroDiarioDto,
+  ) {
+    return await this.libroDiarioService.findAll(user, query);
   }
 
   @Get(':id')

@@ -4,14 +4,13 @@ import { UpdateLibroDiarioDto } from './dto/update-libro-diario.dto';
 import { UserAuth } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma.service';
 import { Libro_Diario } from '@prisma/client';
+import { FindLibroDiarioDto } from './dto/find-libro-diario.dto';
 
 @Injectable()
 export class LibroDiarioService {
   constructor(private prisma: PrismaService) {}
 
   async create(createLibroDiarioDto: CreateLibroDiarioDto, user: UserAuth) {
-    console.log('ultimoAsiento');
-
     // en caso de que el asiento no sea enviado se colocara el ultimo asiento de la base de datos
     let ultimoAsiento: number | null = null;
     if (!createLibroDiarioDto.asiento) {
@@ -29,8 +28,17 @@ export class LibroDiarioService {
       } else {
         ultimoAsiento = ultimoAsientoData.asiento;
       }
+    } else {
+      const existAsiento = await this.prisma.libro_Diario.findFirst({
+        where: {
+          asiento: createLibroDiarioDto.asiento,
+        },
+      });
+
+      if (existAsiento) {
+        throw new ConflictException('Ese Asiento Ya existe');
+      }
     }
-    console.log('ultimoAsiento');
 
     try {
       const result = await this.prisma.$transaction(async (prisma) => {
@@ -58,13 +66,11 @@ export class LibroDiarioService {
         });
         try {
           const responses = await Promise.all(promises);
-          console.log(responses);
           return responses;
         } catch (error) {
           console.error(error);
         }
       });
-      console.log(result);
       return result;
     } catch (error) {
       console.error(error);
@@ -72,16 +78,19 @@ export class LibroDiarioService {
     }
   }
 
-  async findAll(user: UserAuth) {
+  async findAll(user: UserAuth, query: FindLibroDiarioDto) {
     const dataLibroDiario = await this.prisma.libro_Diario.findMany({
       where: {
         companyId: user.companyId,
+        fecha: {
+          gte: query.fechaMovimientoDesde || undefined,
+          lte: query.fechaMovimientoHasta || undefined,
+        },
       },
     });
     // await this.prisma.libro_Diario.deleteMany();
 
     return dataLibroDiario;
-    return `This action returns all libroDiario`;
   }
 
   findOne(id: number, user: UserAuth) {
