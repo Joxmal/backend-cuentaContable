@@ -5,6 +5,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma.service';
 
 import { hash } from 'bcrypt'; // encriptar
+import { UserAuth } from 'src/auth/auth.service';
+import { Role } from 'src/common/enums/rol.enum';
 // import { Role } from 'src/common/enums/rol.enum';
 
 @Injectable()
@@ -60,10 +62,32 @@ export class UserService {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return updateUserDto;
+  async update(id: number, updateUserDto: UpdateUserDto, user: UserAuth) {
+    if (user.roleCompanyId) {
+    }
 
-    return `This action updates a #${id} user`;
+    const { password } = updateUserDto;
+
+    const hashedPassword = await hash(password, 10);
+
+    try {
+      const userEdit = await this.prisma.auth_users.update({
+        where: {
+          id,
+          is_active: true,
+        },
+        data: {
+          ...updateUserDto,
+          password: hashedPassword,
+        },
+      });
+      return {
+        message: 'Usuario actualizado correctamente',
+        user: userEdit, // Puedes incluir el usuario actualizado si lo deseas
+      };
+    } catch (error) {
+      throw new ConflictException('error al actualizar usuario');
+    }
   }
 
   async remove(id: number) {

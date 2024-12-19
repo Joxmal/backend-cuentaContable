@@ -17,6 +17,8 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 //decoradores de autenticacion
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { Role } from 'src/common/enums/rol.enum';
+import { ExtractToken } from 'src/common/decorators/userToken.decorator';
+import { UserAuth } from 'src/auth/auth.service';
 
 @ApiTags('Modulo Users')
 @ApiBearerAuth()
@@ -41,10 +43,14 @@ export class UserController {
     return this.userService.findOne(+id);
   }
 
-  @Auth(Role.USER)
+  @Auth(Role.SUPERADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @ExtractToken() user: UserAuth,
+  ) {
+    return this.userService.update(+id, updateUserDto, user);
   }
 
   @Delete(':id')

@@ -52,11 +52,14 @@ export class CuentasContablesService {
 
   async findAll_Tipos() {
     let tipos = await this.prisma.cuenta_contables_tipo.findMany();
+
+    //si cuenta_contables_tipo esta vacio lo va a crear por primera vez en la bd
     if (tipos.length === 0) {
       const dataToInsert = cuentasPrimary.map((cuenta) => ({
         codigo: cuenta.value,
         nombre: cuenta.tipo,
         description: cuenta.description,
+        naturaleza: cuenta.naturaleza,
       }));
 
       await this.prisma.cuenta_contables_tipo.createMany({
@@ -66,10 +69,8 @@ export class CuentasContablesService {
     }
 
     return tipos; // Retorna los tipos encontrados o insertados
-
-    return cuentasPrimary;
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   async findAll(user: UserAuth) {
     //TODO: darle uso al user
     try {

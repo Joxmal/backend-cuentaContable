@@ -34,14 +34,26 @@ model Auth_company {
 
   Cuenta_contables Cuenta_contables[] @relation("CompanyCuenta_contables")
 
-  authKeyCompany String  @unique
-  description    String? @default("")
+  authKeyCompany String @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   is_active Boolean  @default(true)
 
+  data_company Data_Company? @relation("AuthCompany_DataCompany")
+
   @@map("auth_company")
+}
+
+model Data_Company {
+  id Int @id @default(autoincrement())
+
+  nameCompany String
+
+  description String? @default("")
+
+  company   Auth_company? @relation("AuthCompany_DataCompany", fields: [companyId], references: [id])
+  companyId Int?          @unique
 }
 
 model Auth_users {
@@ -51,6 +63,8 @@ model Auth_users {
   description String? @default("")
   email       String?
 
+  createCompanyPermission Boolean @default(false)
+
   first_name  String?
   second_name String?
 
@@ -59,7 +73,8 @@ model Auth_users {
 
   Admin_logs Admin_logs[]
 
-  role Role? @relation("Auth_usersRole")
+  roleId Int?
+  role   Role? @relation("Auth_usersRole", fields: [roleId], references: [id])
 
   primaryRole PrimaryRole @default(user)
 
@@ -80,8 +95,7 @@ model Role {
   permissions   Permissions? @relation("RolePermissions", fields: [permissionsId], references: [id]) // Relación uno a uno
   permissionsId Int?         @unique // Llave foránea opcional para la relación con Permissions
 
-  auth_users   Auth_users @relation("Auth_usersRole", fields: [auth_usersId], references: [id])
-  auth_usersId Int        @unique
+  auth_users Auth_users[] @relation("Auth_usersRole")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -131,10 +145,11 @@ model Groups_company_plan {
 }
 
 model Cuenta_contables_tipo {
-  id          Int     @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   nombre      String
-  description String? @default("")
-  codigo      Int     @unique // Código único para la cuenta
+  description String?  @default("")
+  naturaleza  Boolean? @default(true) // Deudora = true  // Acreedora= false
+  codigo      Int      @unique // Código único para la cuenta
 
   Cuenta_contables Cuenta_contables[] @relation("Cuenta_contables_TIPO")
 

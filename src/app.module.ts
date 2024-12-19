@@ -16,6 +16,9 @@ import { UserModule } from './user/user.module';
 import { CuentasContablesModule } from './cuentas-contables/cuentas-contables.module';
 import { LibroDiarioModule } from './libro-diario/libro-diario.module';
 import { LibroMayorModule } from './libro-mayor/libro-mayor.module';
+import { SeedModule } from './seed/seed.module';
+import { CompanyModule } from './company/company.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -29,6 +32,9 @@ import { LibroMayorModule } from './libro-mayor/libro-mayor.module';
     CuentasContablesModule,
     LibroDiarioModule,
     LibroMayorModule,
+    SeedModule,
+    CompanyModule,
+    RolesModule,
   ],
   controllers: [],
   providers: [],
