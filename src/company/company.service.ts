@@ -10,30 +10,38 @@ export class CompanyService {
   constructor(private prisma: PrismaService) {}
 
   async create(createCompanyDto: CreateCompanyDto, user: UserAuth) {
+    //si el usuario que esta creando tiene el rol SUPERADMIN
+    // verifica que tenga createCompanyPermission para crear empresas
     if (user.rolePrimary === Role.SUPERADMIN) {
       const userExist = await this.prisma.auth_users.findFirst({
         where: {
           id: user.userId,
         },
       });
+      // si no tiene createCompanyPermission lo rechaza
       if (!userExist.createCompanyPermission) {
         throw new ConflictException('no tienes permisos para crear empresas');
       }
     }
 
+    // verifica que el key (llave de compañia sea unico)
     const keyExist = await this.prisma.auth_company.findFirst({
       where: {
         authKeyCompany: createCompanyDto.authKeyCompany,
       },
     });
 
+    // verifica que el key ya existe retorna error
     if (keyExist) {
       throw new ConflictException('Esta key ya existe');
     }
 
+    // crea la compañia segun el DTO
+
     const createCompany = await this.prisma.auth_company.create({
       data: {
         authKeyCompany: createCompanyDto.authKeyCompany,
+        groups_company_planId: createCompanyDto.planCompanyId || undefined,
         data_company: {
           create: {
             nameCompany: createCompanyDto.data_company.nameCompany,

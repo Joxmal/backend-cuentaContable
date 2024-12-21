@@ -1,5 +1,10 @@
 import { Type } from 'class-transformer';
-import { IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 class Data_company {
   @IsString()
@@ -13,6 +18,10 @@ class Data_company {
 export class CreateCompanyDto {
   @IsString()
   authKeyCompany: string;
+
+  @IsOptional()
+  @IsNumber()
+  planCompanyId?: number;
 
   @IsOptional()
   @ValidateNested()

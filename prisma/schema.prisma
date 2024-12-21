@@ -26,7 +26,8 @@ model Auth_company {
   auth_users Auth_users[] @relation("CompanyUsers") // Relación uno a muchos
   roles      Role[]       @relation("CompanyRoles") // Relación uno a muchos
 
-  groups_company_plan Groups_company_plan? @relation("CompanyGroups") // Relación uno a uno
+  groups_company_planId Int?
+  groups_company_plan   Groups_company_plan? @relation("CompanyGroups", fields: [groups_company_planId], references: [id]) // Relación uno a uno
 
   Libro_Diario Libro_Diario[] @relation("CompanyLibroDiario")
 
@@ -109,13 +110,10 @@ model Role {
 
 model Permissions {
   id                   Int     @id @default(autoincrement())
+  libro_diario         Boolean @default(false)
   libro_mayor          Boolean @default(false)
-  libro_diario_        Boolean @default(false)
-  bancos               Boolean @default(false)
-  caja                 Boolean @default(false)
   balance_comprobacion Boolean @default(false)
   est_financieros      Boolean @default(false)
-  asientos_contables   Boolean @default(false)
   export_data          Boolean @default(false)
   import_data          Boolean @default(false)
 
@@ -124,24 +122,23 @@ model Permissions {
   Groups_company_plan Groups_company_plan? @relation("PermissionsGroups_company_plan")
 
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 }
 
 model Groups_company_plan {
   id          Int     @id @default(autoincrement())
-  nombre      String
+  nombre      String  @unique
   description String? @default("")
 
   permissions   Permissions @relation("PermissionsGroups_company_plan", fields: [permissionsId], references: [id])
   permissionsId Int         @unique
 
-  companyId Int?          @unique // Este campo puede ser opcional si un plan no siempre está asociado a una empresa
-  company   Auth_company? @relation("CompanyGroups", fields: [companyId], references: [id])
+  company Auth_company[] @relation("CompanyGroups")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([companyId, nombre])
+  @@unique([permissionsId, nombre])
 }
 
 model Cuenta_contables_tipo {

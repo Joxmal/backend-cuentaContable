@@ -19,6 +19,7 @@ import { LibroMayorModule } from './libro-mayor/libro-mayor.module';
 import { SeedModule } from './seed/seed.module';
 import { CompanyModule } from './company/company.module';
 import { RolesModule } from './roles/roles.module';
+import { CompanyPlanModule } from './company-plan/company-plan.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { RolesModule } from './roles/roles.module';
     SeedModule,
     CompanyModule,
     RolesModule,
+    CompanyPlanModule,
   ],
   controllers: [],
   providers: [],

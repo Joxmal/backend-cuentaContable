@@ -6,7 +6,6 @@ import { PrismaService } from 'src/prisma.service';
 
 import { hash } from 'bcrypt'; // encriptar
 import { UserAuth } from 'src/auth/auth.service';
-import { Role } from 'src/common/enums/rol.enum';
 // import { Role } from 'src/common/enums/rol.enum';
 
 @Injectable()
@@ -40,6 +39,8 @@ export class UserService {
         data: {
           companyId: createUserDto.companyId,
           username: createUserDto.userName,
+          first_name: createUserDto.first_name,
+          second_name: createUserDto.second_name,
           password: createUserDto.password,
           primaryRole: createUserDto.rolePrimary,
         },
