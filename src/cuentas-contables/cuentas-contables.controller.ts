@@ -18,13 +18,13 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Modulo CUENTAS-CONTABLES')
 @ApiBearerAuth()
-@Auth(Role.ROOT)
 @Controller('cuentas-contables')
 export class CuentasContablesController {
   constructor(
     private readonly cuentasContablesService: CuentasContablesService,
   ) {}
 
+  @Auth(Role.USER)
   @Post()
   create(
     @Body() createCuentasContableDto: CreateCuentasContableDto,
@@ -33,20 +33,23 @@ export class CuentasContablesController {
     return this.cuentasContablesService.create(createCuentasContableDto, user);
   }
 
+  @Auth(Role.USER)
   @Get()
   findAll(@ExtractToken() user: UserAuth) {
     return this.cuentasContablesService.findAll(user);
   }
+  @Auth(Role.USER)
   @Get('tipos')
   findAllTipos() {
     return this.cuentasContablesService.findAll_Tipos();
   }
-
+  @Auth(Role.USER)
   @Get(':id')
   findOne(@Param('id') id: number, @ExtractToken() user: UserAuth) {
     return this.cuentasContablesService.findOne(id, user);
   }
 
+  @Auth(Role.USER)
   @Patch(':id')
   async update(
     @Param('id') id: string,
@@ -58,6 +61,7 @@ export class CuentasContablesController {
     );
   }
 
+  @Auth(Role.USER)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.cuentasContablesService.remove(+id);

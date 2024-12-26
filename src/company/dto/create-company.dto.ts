@@ -21,6 +21,10 @@ export class CreateCompanyDto {
 
   @IsOptional()
   @IsNumber()
+  authKeySystemFoxPro?: number;
+
+  @IsOptional()
+  @IsNumber()
   planCompanyId?: number;
 
   @IsOptional()

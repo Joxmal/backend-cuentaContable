@@ -43,14 +43,13 @@ export class LibroDiarioService {
     try {
       const result = await this.prisma.$transaction(async (prisma) => {
         // Tipar promises con un arreglo de promesas específicas de los modelos
-        const promises: Array<Promise<Libro_Diario>> = [];
+        const promisesLibroDiario: Array<Promise<Libro_Diario>> = [];
 
         //sumamos uno al ultimo asiento colocar el siguiente en la BD
         ++ultimoAsiento;
 
-        // Actualizar puntos de venta
         createLibroDiarioDto.createdRowLibroDiario.forEach((row) => {
-          promises.push(
+          promisesLibroDiario.push(
             prisma.libro_Diario.create({
               data: {
                 asiento: createLibroDiarioDto.asiento || ultimoAsiento,
@@ -65,7 +64,7 @@ export class LibroDiarioService {
           );
         });
         try {
-          const responses = await Promise.all(promises);
+          const responses = await Promise.all(promisesLibroDiario);
           return responses;
         } catch (error) {
           console.error(error);

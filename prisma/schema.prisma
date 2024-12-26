@@ -35,13 +35,15 @@ model Auth_company {
 
   Cuenta_contables Cuenta_contables[] @relation("CompanyCuenta_contables")
 
-  authKeyCompany String @unique
+  authKeyCompany      String @unique // llav unica por parte del sistema contable (indivudual)
+  authKeySystemFoxPro Int? // llave unica por parte del sistema contable perteneciente al sr jesus
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   is_active Boolean  @default(true)
 
-  data_company Data_Company? @relation("AuthCompany_DataCompany")
+  data_company Data_Company?  @relation("AuthCompany_DataCompany")
+  Cierre_Anual Cierre_Anual[] @relation("CierreAnual_AuthCompany_")
 
   @@map("auth_company")
 }
@@ -176,6 +178,21 @@ model Cuenta_contables {
   @@unique([companyId, codigo])
 }
 
+model Cierre_Anual {
+  id Int @id @default(autoincrement())
+
+  companyId Int? // Llave foránea que referencia a Auth_company
+  company   Auth_company? @relation("CierreAnual_AuthCompany_", fields: [companyId], references: [id]) // Relación inversa
+
+  periodoYeard Int
+
+  totalIngresos Decimal @default(0) @db.Decimal(10, 4)
+  totalGastos   Decimal @default(0) @db.Decimal(10, 4)
+  gananciaNeta  Decimal @default(0) @db.Decimal(10, 4)
+
+  @@unique([companyId, periodoYeard])
+}
+
 model Libro_Diario {
   id          Int      @id @default(autoincrement())
   asiento     Int
@@ -184,8 +201,8 @@ model Libro_Diario {
   cuentaId    Int // Referencia a la cuenta
   // cuenta      Cuenta_contables @relation("Cuenta_contablesToLibro_Diario", fields: [cuentaId], references: [codigo])
   descripcion String?
-  debe        Float
-  haber       Float
+  debe        Decimal  @db.Decimal(10, 4)
+  haber       Decimal  @db.Decimal(10, 4)
 
   // Relación con Auth_company
   companyId Int? // Llave foránea que referencia a Auth_company
@@ -209,4 +226,19 @@ model Admin_logs {
 
   companyId Int // Llave foránea que referencia a Auth_company
   company   Auth_company @relation("CompanyLogs", fields: [companyId], references: [id]) // Relación inversa
+}
+
+model Inventario {
+  id Int @id @default(autoincrement())
+
+}
+
+model DatosSrJuan {
+  id Int @id @default(autoincrement())
+
+  // aperturaCaja Decimal @db.Decimal(10, 4) // es el dinero que siempre esta en caja (fondo de caja)
+
+  venta               Decimal @db.Decimal(10, 4)
+  metodoPagoCliente   String  @default("punto") // 'punto', 'pago movil', 'efectivo', 'monedaExtrangera'
+  motodoVueltoCliente String  @default("efectivo")
 }

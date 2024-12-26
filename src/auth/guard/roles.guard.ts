@@ -38,20 +38,22 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('No se ha iniciado sesión');
     }
 
-    const companyAuth = await this.prisma.auth_company.findUnique({
-      where: {
-        id: request.companyId,
-        auth_users: {
-          some: {
-            id: request.userId,
-            username: request.name,
+    if (request.role !== 'root') {
+      const companyAuth = await this.prisma.auth_company.findUnique({
+        where: {
+          id: request.companyId,
+          auth_users: {
+            some: {
+              id: request.userId,
+              username: request.name,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (!companyAuth) {
-      throw new ForbiddenException('usted no pertenece a la compañia');
+      if (!companyAuth) {
+        throw new ForbiddenException('usted no pertenece a la compañia');
+      }
     }
 
     return this.hasAccess(request.role, requiredRole);

@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 import { PrismaService } from 'src/prisma.service';
 
-import { hash } from 'bcrypt'; // encriptar
+// import { hash } from 'bcrypt'; // encriptar
 import { UserAuth } from 'src/auth/auth.service';
 // import { Role } from 'src/common/enums/rol.enum';
 
@@ -28,11 +28,11 @@ export class UserService {
       }
 
       const { password } = createUserDto;
-      const hashedPassword = await hash(password, 10);
+      // const hashedPassword = await hash(password, 10);
 
       createUserDto = {
         ...createUserDto,
-        password: hashedPassword,
+        password: password,
       };
 
       return await this.prisma.auth_users.create({
@@ -69,7 +69,7 @@ export class UserService {
 
     const { password } = updateUserDto;
 
-    const hashedPassword = await hash(password, 10);
+    // const hashedPassword = await hash(password, 10);
 
     try {
       const userEdit = await this.prisma.auth_users.update({
@@ -79,7 +79,7 @@ export class UserService {
         },
         data: {
           ...updateUserDto,
-          password: hashedPassword,
+          password: password,
         },
       });
       return {

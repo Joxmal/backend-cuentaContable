@@ -38,9 +38,9 @@ export class CompanyController {
   }
 
   @Auth(Role.SUPERADMIN)
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.companyService.findOne(+id);
+  @Get('SUPERADMIN')
+  findOne(@ExtractToken() user: UserAuth) {
+    return this.companyService.findOne(user);
   }
 
   @Auth(Role.SUPERADMIN)

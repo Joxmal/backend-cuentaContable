@@ -40,6 +40,7 @@ export class CompanyService {
 
     const createCompany = await this.prisma.auth_company.create({
       data: {
+        authKeySystemFoxPro: createCompanyDto.authKeySystemFoxPro || undefined,
         authKeyCompany: createCompanyDto.authKeyCompany,
         groups_company_planId: createCompanyDto.planCompanyId || undefined,
         data_company: {
@@ -60,7 +61,11 @@ export class CompanyService {
         _count: true,
         groups_company_plan: true,
         data_company: true,
-        auth_users: true,
+        auth_users: {
+          include: {
+            role: true,
+          },
+        },
         admin_logs: true,
         roles: {
           include: {
@@ -71,8 +76,24 @@ export class CompanyService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} company`;
+  async findOne(user: UserAuth) {
+    return await this.prisma.auth_company.findUnique({
+      where: {
+        id: user.companyId,
+      },
+      include: {
+        _count: true,
+        groups_company_plan: true,
+        data_company: true,
+        auth_users: {
+          include: {
+            role: true,
+          },
+        },
+        admin_logs: true,
+        roles: true,
+      },
+    });
   }
 
   update(id: number, updateCompanyDto: UpdateCompanyDto) {

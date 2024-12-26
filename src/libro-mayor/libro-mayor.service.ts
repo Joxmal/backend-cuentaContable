@@ -5,13 +5,14 @@ import { FindLibroMayorDto } from './dto/find-libro-mayor.dto';
 import { PrismaService } from 'src/prisma.service';
 import { LibroDiarioService } from 'src/libro-diario/libro-diario.service';
 import { CuentasContablesService } from 'src/cuentas-contables/cuentas-contables.service';
+import { Prisma } from '@prisma/client';
 
 export interface FormattedEntry {
   asiento: number;
   fecha: string | Date;
   descripcion: string;
-  debe: number;
-  haber: number;
+  debe: Prisma.Decimal;
+  haber: Prisma.Decimal;
 }
 
 @Injectable()
@@ -41,6 +42,7 @@ export class LibroMayorService {
       const mapeoName = {
         ...diario,
         cuentaName: cuentaContable?.nombre,
+        naturaleza: cuentaContable.Cuenta_contable_tipo.naturaleza,
       };
 
       return mapeoName;
@@ -59,6 +61,7 @@ export class LibroMayorService {
         const {
           companyId,
           cuentaName,
+          naturaleza,
           asiento,
           fecha,
           descripcion,
@@ -75,16 +78,21 @@ export class LibroMayorService {
         if (!acc[companyId][entry.cuentaId]) {
           acc[companyId][entry.cuentaId] = {
             cuentaName,
+            naturaleza,
             data: [],
-            debe: 0,
-            haber: 0,
+            debe: new Prisma.Decimal(0),
+            haber: new Prisma.Decimal(0),
           };
         }
 
         //sumando
         if (acc[companyId][entry.cuentaId]) {
-          acc[companyId][entry.cuentaId].debe += entry.debe;
-          acc[companyId][entry.cuentaId].haber += entry.haber;
+          acc[companyId][entry.cuentaId].debe = acc[companyId][
+            entry.cuentaId
+          ].debe.plus(new Prisma.Decimal(entry.debe));
+          acc[companyId][entry.cuentaId].haber = acc[companyId][
+            entry.cuentaId
+          ].haber.plus(new Prisma.Decimal(entry.haber));
         }
 
         // Agregar la entrada formateada al array de data
@@ -104,9 +112,10 @@ export class LibroMayorService {
           number,
           {
             cuentaName: string;
+            naturaleza: boolean;
             data: FormattedEntry[];
-            debe: number;
-            haber: number;
+            debe: Prisma.Decimal;
+            haber: Prisma.Decimal;
           }
         >
       >,
@@ -119,12 +128,14 @@ export class LibroMayorService {
       ([companyId, cuentas]) => ({
         companyId: Number(companyId),
         cuentasID: Object.entries(cuentas).map(
-          ([cuentaId, { cuentaName, data, debe, haber }]) => ({
+          ([cuentaId, { cuentaName, naturaleza, data, debe, haber }]) => ({
             cuentaID: Number(cuentaId),
             cuentaName,
+            naturaleza,
             data,
             debe,
             haber,
+            totalNeto: naturaleza ? debe.minus(haber) : haber.minus(debe),
           }),
         ),
       }),

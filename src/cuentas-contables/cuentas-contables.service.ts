@@ -78,6 +78,9 @@ export class CuentasContablesService {
         where: {
           companyId: user.companyId,
         },
+        include: {
+          Cuenta_contable_tipo: true,
+        },
         orderBy: {
           codigo: 'asc',
         },

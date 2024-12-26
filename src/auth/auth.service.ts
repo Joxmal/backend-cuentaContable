@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 
-import { compare } from 'bcrypt';
+// import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { LoginAuthDto } from './dto/login-auth.dto';
 
@@ -94,23 +94,17 @@ export class AuthService {
     if (!userExist)
       throw new HttpException('usuario no encontrado', HttpStatus.FORBIDDEN);
 
-    /*   if (userExist.role === Role.USER) {
-        if (!user.cajeroName || !user.cajeroPassword) {
-          throw new HttpException(
-            'Complete los campos del cajero',
-            HttpStatus.FORBIDDEN,
-            );
-            } */
+    // ya no se necesita el chequeo de contraseña
+    // const checkPassword = await compare(
+    //   user.Userpassword,
+    //   userExist.auth_users[0].password,
+    // );
 
-    // console.log('cajero', cajero);
-    // console.log('user', user.cajeroPassword);
+    // if (!checkPassword) throw new HttpException('contraseña incorrecta', 403);
 
-    const checkPassword = await compare(
-      user.Userpassword,
-      userExist.auth_users[0].password,
-    );
-
-    if (!checkPassword) throw new HttpException('contraseña incorrecta', 403);
+    if (userExist.auth_users[0].password !== user.Userpassword) {
+      throw new HttpException('contraseña incorrecta', HttpStatus.FORBIDDEN);
+    }
 
     const payload: Payload = {
       userId: userExist.auth_users[0].id,
