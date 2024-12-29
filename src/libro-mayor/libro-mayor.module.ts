@@ -9,5 +9,6 @@ import { CuentasContablesModule } from 'src/cuentas-contables/cuentas-contables.
   controllers: [LibroMayorController],
   providers: [LibroMayorService, PrismaService],
   imports: [LibroDiarioModule, CuentasContablesModule],
+  exports: [LibroMayorService],
 })
 export class LibroMayorModule {}

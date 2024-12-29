@@ -86,6 +86,9 @@ export class LibroDiarioService {
           lte: query.fechaMovimientoHasta || undefined,
         },
       },
+      orderBy: {
+        asiento: 'desc',
+      },
     });
     // await this.prisma.libro_Diario.deleteMany();
 

@@ -102,10 +102,10 @@ model Role {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  is_active Boolean
+  is_active Boolean? @default(true)
 
-  companyId Int // Llave foránea que referencia a Auth_company
-  company   Auth_company @relation("CompanyRoles", fields: [companyId], references: [id]) // Relación inversa
+  companyId Int? // Llave foránea que referencia a Auth_company
+  company   Auth_company? @relation("CompanyRoles", fields: [companyId], references: [id]) // Relación inversa
 
   @@unique([companyId, name])
 }
@@ -230,7 +230,6 @@ model Admin_logs {
 
 model Inventario {
   id Int @id @default(autoincrement())
-
 }
 
 model DatosSrJuan {

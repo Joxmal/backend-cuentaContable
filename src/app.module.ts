@@ -20,6 +20,8 @@ import { SeedModule } from './seed/seed.module';
 import { CompanyModule } from './company/company.module';
 import { RolesModule } from './roles/roles.module';
 import { CompanyPlanModule } from './company-plan/company-plan.module';
+import { BalanceComprobacionModule } from './balance-comprobacion/balance-comprobacion.module';
+import { BalanceGeneralModule } from './balance-general/balance-general.module';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { CompanyPlanModule } from './company-plan/company-plan.module';
     CompanyModule,
     RolesModule,
     CompanyPlanModule,
+    BalanceComprobacionModule,
+    BalanceGeneralModule,
   ],
   controllers: [],
   providers: [],

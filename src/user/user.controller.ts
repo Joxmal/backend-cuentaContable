@@ -26,9 +26,13 @@ import { UserAuth } from 'src/auth/auth.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Auth(Role.SUPERADMIN)
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.create(createUserDto);
+  async create(
+    @Body() createUserDto: CreateUserDto,
+    @ExtractToken() user: UserAuth,
+  ) {
+    return await this.userService.create(createUserDto, user);
   }
 
   @Auth(Role.USER)
@@ -52,7 +56,7 @@ export class UserController {
   ) {
     return this.userService.update(+id, updateUserDto, user);
   }
-
+  @Auth(Role.SUPERADMIN)
   @Delete(':id')
   async remove(@Param('id') id: number) {
     return await this.userService.remove(id);

@@ -7,10 +7,6 @@ import {
 } from 'class-validator';
 import { Role } from 'src/common/enums/rol.enum';
 export class CreateUserDto {
-  @IsNumber()
-  @IsNotEmpty()
-  companyId: number;
-
   @IsString()
   @IsNotEmpty()
   userName: string;
@@ -32,6 +28,14 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsIn(['user', 'admin', 'superAdmin', 'root'])
   rolePrimary: Role;
+
+  @IsOptional()
+  @IsString()
+  description: string;
+
+  @IsOptional()
+  @IsString()
+  email: string;
 
   @IsOptional()
   @IsNumber()
