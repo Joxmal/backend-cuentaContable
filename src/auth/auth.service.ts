@@ -18,7 +18,7 @@ import { $Enums } from '@prisma/client';
 
 export interface Payload {
   userId: number;
-  company: string;
+  company: number;
   companyId: number;
   user: string;
   rolePrimary: $Enums.PrimaryRole;
@@ -50,7 +50,7 @@ export class AuthService {
   ) {}
 
   async loginUser(user: LoginAuthDto) {
-    const userExist = await this.prisma.auth_company.findUnique({
+    const CompanyExisting = await this.prisma.auth_company.findUnique({
       where: {
         authKeyCompany: user.authKeyCompany,
         auth_users: {
@@ -88,10 +88,7 @@ export class AuthService {
       },
     });
 
-    // console.log('userExist', userExist);
-    // console.log('user', user);
-
-    if (!userExist)
+    if (!CompanyExisting)
       throw new HttpException('usuario no encontrado', HttpStatus.FORBIDDEN);
 
     // ya no se necesita el chequeo de contraseña
@@ -102,30 +99,32 @@ export class AuthService {
 
     // if (!checkPassword) throw new HttpException('contraseña incorrecta', 403);
 
-    if (userExist.auth_users[0].password !== user.Userpassword) {
+    if (CompanyExisting.auth_users[0].password !== user.Userpassword) {
       throw new HttpException('contraseña incorrecta', HttpStatus.FORBIDDEN);
     }
 
+    const { authKeyCompany, auth_users, id } = CompanyExisting;
+
     const payload: Payload = {
-      userId: userExist.auth_users[0].id,
-      companyId: userExist.id,
-      company: userExist.authKeyCompany,
-      user: userExist.auth_users[0].username,
-      rolePrimary: userExist.auth_users[0].primaryRole,
-      roleCompanyId: userExist.auth_users[0].role,
+      userId: auth_users[0].id,
+      companyId: id,
+      company: authKeyCompany,
+      user: auth_users[0].username,
+      rolePrimary: auth_users[0].primaryRole,
+      roleCompanyId: auth_users[0].role,
     };
 
     const token = this.jwtService.sign(payload);
 
-    delete userExist.auth_users[0].password;
+    delete auth_users[0].password;
 
     const data = {
       token,
       user: {
-        firstName: userExist.auth_users[0].first_name,
-        lastName: userExist.auth_users[0].first_name,
-        rolePrimary: userExist.auth_users[0].primaryRole,
-        roleCompany: userExist.auth_users[0].role,
+        firstName: auth_users[0].first_name,
+        lastName: auth_users[0].first_name,
+        rolePrimary: auth_users[0].primaryRole,
+        roleCompany: auth_users[0].role,
       },
     };
 
@@ -135,7 +134,6 @@ export class AuthService {
   async decodeToken(token: string) {
     try {
       const result = await this.jwtService.verifyAsync(token); // Verifica el token
-      // console.log(result); // Muestra el contenido decodificado del token
       return result; // Retorna el payload del token
     } catch (error) {
       console.error('Token inválido');

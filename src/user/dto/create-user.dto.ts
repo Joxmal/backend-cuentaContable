@@ -40,4 +40,8 @@ export class CreateUserDto {
   @IsOptional()
   @IsNumber()
   roleCompanyId: number;
+
+  @IsOptional()
+  @IsNumber()
+  companyId: number;
 }

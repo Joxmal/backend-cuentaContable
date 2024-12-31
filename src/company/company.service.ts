@@ -40,7 +40,6 @@ export class CompanyService {
 
     const createCompany = await this.prisma.auth_company.create({
       data: {
-        authKeySystemFoxPro: createCompanyDto.authKeySystemFoxPro || undefined,
         authKeyCompany: createCompanyDto.authKeyCompany,
         groups_company_planId: createCompanyDto.planCompanyId || undefined,
         data_company: {

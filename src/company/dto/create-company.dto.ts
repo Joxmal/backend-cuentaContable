@@ -16,12 +16,8 @@ class Data_company {
 }
 
 export class CreateCompanyDto {
-  @IsString()
-  authKeyCompany: string;
-
-  @IsOptional()
   @IsNumber()
-  authKeySystemFoxPro?: number;
+  authKeyCompany: number;
 
   @IsOptional()
   @IsNumber()

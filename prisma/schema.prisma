@@ -35,8 +35,7 @@ model Auth_company {
 
   Cuenta_contables Cuenta_contables[] @relation("CompanyCuenta_contables")
 
-  authKeyCompany      String @unique // llav unica por parte del sistema contable (indivudual)
-  authKeySystemFoxPro Int? // llave unica por parte del sistema contable perteneciente al sr jesus
+  authKeyCompany Int @unique // llav unica por parte del sistema contable (indivudual)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

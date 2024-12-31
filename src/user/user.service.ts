@@ -15,8 +15,10 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto, user: UserAuth) {
     //solo los root pueden crear roles para otros usuarios de lo contrario siempre sera un user
+    // si no es el root el DTO se reemplaza por los datos del usuario
     if (user.rolePrimary !== 'root') {
       createUserDto.rolePrimary = Role.USER;
+      createUserDto.companyId = user.companyId;
     }
 
     // busca si el usuario existe
@@ -24,7 +26,7 @@ export class UserService {
       const userExisting = await this.prisma.auth_users.findUnique({
         where: {
           companyId_username: {
-            companyId: user.companyId,
+            companyId: createUserDto.companyId,
             username: createUserDto.userName,
           },
         },
@@ -45,7 +47,7 @@ export class UserService {
 
       return await this.prisma.auth_users.create({
         data: {
-          companyId: user.companyId,
+          companyId: createUserDto.companyId,
           email: createUserDto.email,
           username: createUserDto.userName,
           first_name: createUserDto.first_name,

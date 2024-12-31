@@ -1,8 +1,8 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class LoginAuthDto {
-  @IsString()
-  authKeyCompany: string;
+  @IsNumber()
+  authKeyCompany: number;
 
   @IsOptional()
   @IsString()
